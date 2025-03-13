@@ -135,10 +135,6 @@ for input_vector in test_data:
 
 # Plotting the decision boundary
 def plot_decision_boundary(log_reg, training_data, x_range=(-10, 10), y_range=(-10, 10)):
-    # Extracting the first two features (ignoring the others for simplicity)
-    X = np.array([np.array([x[0][0], x[0][1]]) for x in training_data])
-    y = np.array([x[1] for x in training_data])
-
     # Create a meshgrid for plotting decision boundary
     xx, yy = np.meshgrid(np.linspace(x_range[0], x_range[1], 100), np.linspace(y_range[0], y_range[1], 100))
     Z = np.zeros(xx.shape)
@@ -151,7 +147,12 @@ def plot_decision_boundary(log_reg, training_data, x_range=(-10, 10), y_range=(-
 
     # Plotting the data points and decision boundary
     plt.contourf(xx, yy, Z, levels=[0, 0.5, 1], alpha=0.3, colors=['b', 'g'])
+
+    # Extracting the first two features (ignoring the others for simplicity)
+    X = np.array([np.array([x[0][0], x[0][1]]) for x in training_data])
+    y = np.array([x[1] for x in training_data])
     plt.scatter(X[:, 0], X[:, 1], c=y, s=50, edgecolor='k', cmap=plt.cm.Paired)
+
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
     plt.title('Logistic Regression Decision Boundary')
