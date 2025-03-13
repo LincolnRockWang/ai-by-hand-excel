@@ -52,16 +52,20 @@ class LogisticRegressionSoftmax:
         probabilities = self.activate(z)
 
         # Compute gradient updates for weights and biases
-        total_loss = 0
+        loss = 0
         for class_idx in range(len(weights)):
             error = probabilities[class_idx] - (1 if class_idx == target_class else 0)
+
+            # Update weights
             for i in range(len(input_vector)):
-                self.weights[class_idx][i] -= self.learning_rate * error * input_vector[i]  # Update weights
-            self.biases[class_idx] -= self.learning_rate * error  # Update bias
+                self.weights[class_idx][i] -= self.learning_rate * error * input_vector[i]  
 
-            total_loss += self.cross_entropy_loss(probabilities, target_class)
+            # Update bias
+            self.biases[class_idx] -= self.learning_rate * error  
 
-        return total_loss
+            loss += self.cross_entropy_loss(probabilities, target_class)
+
+        return loss
 
     # Training function
     def train(self, training_data):

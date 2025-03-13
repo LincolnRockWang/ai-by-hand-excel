@@ -54,21 +54,21 @@ class LogisticRegressionSigmoid:
 
         
         # Compute gradient updates for weights and biases
-        total_loss = 0
+        loss = 0
     
         error = target_class - probabilities
 
         # Update weights
         #self.weights = [w + self.learning_rate * error * x for w, x in zip(self.weights, input_vector)]
         for i in range(len(input_vector)):
-            self.weights[i] += self.learning_rate * error * input_vector[i]  
+            self.weights[i] -= self.learning_rate * error * input_vector[i]  
         
         # Update bias
-        self.bias += self.learning_rate * error
+        self.bias -= self.learning_rate * error
 
-        total_loss += self.cross_entropy_loss(probabilities, target_class)
+        loss += self.cross_entropy_loss(probabilities, target_class)
 
-        return total_loss
+        return loss
     
     def train(self, training_data):
 
