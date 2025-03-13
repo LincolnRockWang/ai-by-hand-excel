@@ -1,3 +1,7 @@
+# Logistic Regression is a supervised learning algorithm 
+# used for binary classification (i.e., classifying data into two categories, such as spam vs. not spam, or yes vs. no). 
+# Unlike linear regression, which predicts continuous values, logistic regression predicts probabilities.
+
 
 import random
 import math
