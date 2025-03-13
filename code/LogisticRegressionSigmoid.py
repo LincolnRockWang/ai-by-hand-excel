@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # 1. Logistic Regression (Binary Classification)
-class LogisticRegression:
+class LogisticRegressionSigmoid:
     def __init__(self, learning_rate=0.01, epochs=1000):
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -93,44 +93,49 @@ class LogisticRegression:
 weights = [0.8, 0.5]
 bias = 0
         
+
+# Example training dataset: [(input_vector, correct_class)]
 training_data = [
-    ([3, 2], 0),
-    ([3, 4], 1),
-    ([2, 1], 0),
-    ([2, 3], 1),
-    ([4, 5], 1),
-    ([-3, -2], 1),
-    ([-3, -4], 0),
-    ([-2, -1], 1),
+    ([ 1,  2], 1),
+    ([ 2,  3], 1),
+    ([ 3,  1], 1),
+    ([ 4,  2], 1),
+    ([ 5,  3], 1),
+    
+    ([-1, -2], 0),
     ([-2, -3], 0),
-    ([-4, -5], 0),
+    ([-3, -1], 0),
+    ([-4, -2], 0),
+    ([-5, -3], 0)
 ]
 
 
 # Train and Predict
-log_reg = LogisticRegression()
+log_reg = LogisticRegressionSigmoid()
 log_reg.reset(weights,bias)
 
 log_reg.log()
 log_reg.train(training_data)
 log_reg.log()
 
-input_vectors = [
-    [3, 2],
-    [1, 6],
-    [5, 1],
-    [2, 4],
-    [1, 5],
+test_data = [
+    ([ 3,  2]),   # Should predict 1
+    ([ 0,  0]),   # This is a boundary point (uncertain case)
+    ([ 1, -1]),   # Should predict 1
+    ([-3, -2]),   # Should predict 0
+    ([ 5,  5]),   # Should predict 1
+    ([-5, -4])    # Should predict 0
 ]
 
-for input_vector in input_vectors:
+
+for input_vector in test_data:
     predicted_class, probabilities = log_reg.predict(input_vector)
     print(f"Predicted Class: {predicted_class}, Probabilities: {probabilities:.2f}")
 
 
 # Plotting the decision boundary
 def plot_decision_boundary(log_reg, training_data, x_range=(-10, 10), y_range=(-10, 10)):
-    # Extracting the first two features (ignoring the third for simplicity)
+    # Extracting the first two features (ignoring the others for simplicity)
     X = np.array([np.array([x[0][0], x[0][1]]) for x in training_data])
     y = np.array([x[1] for x in training_data])
 
@@ -145,7 +150,7 @@ def plot_decision_boundary(log_reg, training_data, x_range=(-10, 10), y_range=(-
             Z[i, j] = prob
 
     # Plotting the data points and decision boundary
-    plt.contourf(xx, yy, Z, levels=[0, 0.5, 1], alpha=0.3, colors=['r', 'g'])
+    plt.contourf(xx, yy, Z, levels=[0, 0.5, 1], alpha=0.3, colors=['b', 'g'])
     plt.scatter(X[:, 0], X[:, 1], c=y, s=50, edgecolor='k', cmap=plt.cm.Paired)
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
