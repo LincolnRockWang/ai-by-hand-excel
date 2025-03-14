@@ -1,13 +1,21 @@
-# Logistic Regression is a supervised learning algorithm 
+# Logistic Classification is a supervised learning algorithm 
 # used for binary classification (i.e., classifying data into two categories, such as spam vs. not spam, or yes vs. no). 
 # Unlike linear regression, which predicts continuous values, logistic regression predicts probabilities.
+
+"""
+Should We Call It "Logistic Classification" Instead?
+Yes! Logistic Regression is only used for classification
+Calling it "Logistic Classification" would make more sense.
+But the term "Logistic Regression" is widely used.
+So, even though it's technically a classification algorithm, "Logistic Regression" remains the standard name.'
+"""
 
 import math
 import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-class LogisticRegressionSoftmax:
+class LogisticClassificationSoftmax:
     def __init__(self, learning_rate=0.01, epochs=1000):
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -29,14 +37,27 @@ class LogisticRegressionSoftmax:
 
         
 
+        
+    def activate(self, inputs):
+        return self.softmax(inputs)
+    
+    def derivative(self, softmax_output):
+        """Compute Softmax Jacobian Matrix"""
+        jacobian = [[0.0 for _ in range(len(softmax_output))] for _ in range(len(softmax_output))]
+        for i in range(len(softmax_output)):
+            for j in range(len(softmax_output)):
+                if i == j:
+                    jacobian[i][j] = softmax_output[i] * (1 - softmax_output[i])  # Diagonal terms
+                else:
+                    jacobian[i][j] = -softmax_output[i] * softmax_output[j]  # Off-diagonal terms
+        return jacobian
+
+
     def softmax(self, inputs):
         exp_values = [math.exp(x) for x in inputs]
         sum_exp_values = sum(exp_values)
         return [exp_val / sum_exp_values for exp_val in exp_values]
 
-            
-    def activate(self, inputs):
-        return self.softmax(inputs)
 
 
     # Cross-entropy loss function (for both softmax and sigmoid cases)
@@ -51,17 +72,26 @@ class LogisticRegressionSoftmax:
         # Apply the chosen activation function
         probabilities = self.activate(z)
 
+        # Compute Softmax Derivative (Jacobian Matrix)
+        gradient = self.derivative(probabilities)
+
+        num_classes = len(self.weights)
+
         # Compute gradient updates for weights and biases
         loss = 0
-        for class_idx in range(len(weights)):
-            error = probabilities[class_idx] - (1 if class_idx == target_class else 0)
+        for class_idx in range(num_classes):
+            # Compute target one-hot vector inside the loop
+            target_one_hot = (1 if class_idx == target_class else 0)
+
+            # Compute error for this class
+            error = probabilities[class_idx] - target_one_hot
 
             # Update weights
             for i in range(len(input_vector)):
-                self.weights[class_idx][i] -= self.learning_rate * error * input_vector[i]  
+                self.weights[class_idx][i] -= self.learning_rate * error * gradient[class_idx][i] * input_vector[i]  
 
             # Update bias
-            self.biases[class_idx] -= self.learning_rate * error  
+            self.biases[class_idx] -= self.learning_rate * error * gradient[class_idx][i]
 
             loss += self.cross_entropy_loss(probabilities, target_class)
 
@@ -111,7 +141,7 @@ training_data = [
 ]
 
 
-log_reg = LogisticRegressionSoftmax(learning_rate=0.01, epochs=1000)
+log_reg = LogisticClassificationSoftmax(learning_rate=0.01, epochs=1000)
 log_reg.reset(weights,biases)
 
 log_reg.log()
@@ -155,7 +185,7 @@ def plot_decision_boundary(log_reg, training_data, x_range=(-10, 10), y_range=(-
 
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
-    plt.title('Logistic Regression Decision Boundary')
+    plt.title('Logistic Classification Decision Boundary')
     plt.show()
 
 # Plot the decision boundary

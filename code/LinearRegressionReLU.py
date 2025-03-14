@@ -41,9 +41,28 @@ class LinearRegression:
         self.weights = np.array(weights, dtype=np.float64)
         self.bias = bias
 
-    def activate(self, z):
-        """Identity Activation Function (Linear Activation)"""
-        return z  # Linear regression uses identity activation
+    """
+        Activation  	Best Use Case for Linear Regression
+        None (Linear)	Default, continuous values
+        ReLU	        When outputs must be non-negative
+        Sigmoid	        For probability-based outputs (rare)
+        Softmax	        Not used for regression
+        Tanh	        For outputs in [-1, 1]
+    """
+    def activate(self, inputs):
+        return self.relu(inputs)
+    
+    def derivative(self, outputs):
+        return self.relu_derivative(outputs)
+    
+    def relu(self, inputs):
+        """ReLU Activation Function"""
+        return np.maximum(0, inputs)  # Apply ReLU (max(0, x))
+    
+    def relu_derivative(self, outputs):
+        """Derivative of ReLU Activation Function"""
+        return np.where(outputs > 0, 1, 0)  # Derivative is 1 if output > 0, else 0
+
 
 
     def mean_squared_error(self, predictions, targets):
@@ -62,11 +81,13 @@ class LinearRegression:
         # Compute error (difference between prediction and actual value)
         error = prediction - target_value
 
+        gradient = self.derivative(prediction)
+
         # Update weights (using the derivative of MSE)
-        self.weights -= self.learning_rate * error * np.array(input_vector)
+        self.weights -= self.learning_rate * error * gradient * np.array(input_vector)
         
         # Update bias
-        self.bias -= self.learning_rate * error
+        self.bias -= self.learning_rate * error * gradient
 
         loss = self.mean_squared_error(prediction, target_value)
 

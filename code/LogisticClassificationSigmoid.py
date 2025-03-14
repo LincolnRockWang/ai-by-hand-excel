@@ -1,6 +1,16 @@
-# Logistic Regression is a supervised learning algorithm 
+# Logistic Classification is a supervised learning algorithm 
 # used for binary classification (i.e., classifying data into two categories, such as spam vs. not spam, or yes vs. no). 
-# Unlike linear regression, which predicts continuous values, logistic regression predicts probabilities.
+# Unlike linear regression, which predicts continuous values, Logistic Classification predicts probabilities.
+
+
+
+"""
+Should We Call It "Logistic Classification" Instead?
+Yes! Logistic Regression is only used for classification
+Calling it "Logistic Classification" would make more sense.
+But the term "Logistic Regression" is widely used.
+So, even though it's technically a classification algorithm, "Logistic Regression" remains the standard name.'
+"""
 
 
 import random
@@ -8,8 +18,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 1. Logistic Regression (Binary Classification)
-class LogisticRegressionSigmoid:
+# 1. Logistic Classification (Binary Classification)
+class LogisticClassificationSigmoid:
     def __init__(self, learning_rate=0.01, epochs=1000):
         self.learning_rate = learning_rate
         self.epochs = epochs
@@ -29,14 +39,19 @@ class LogisticRegressionSigmoid:
         self.weights = weights
         self.bias = bias
 
+    def activate(self, inputs):
+        return self.sigmoid(inputs)
 
-    def sigmoid(self, z):
-        # Clip values of z to prevent overflow in exp()
-        z = max(min(z, 500), -500)  # Clip between -500 and 500
-        return 1 / (1 + math.exp(-z))
     
-    def activate(self, z):
-        return self.sigmoid(z)
+    def derivative(self, outputs):
+        """Derivative of Sigmoid Function"""
+        return outputs * (1 - outputs)  # Sigmoid derivative: f(z) * (1 - f(z))
+
+    def sigmoid(self, inputs):
+        # Clip values of z to prevent overflow in exp()
+        clipped = max(min(inputs, 500), -500)  # Clip between -500 and 500
+        return 1 / (1 + math.exp(-clipped))
+    
     
     def cross_entropy_loss(self, predictions, target_class):
         # Binary classification: predictions is a single scalar
@@ -58,13 +73,15 @@ class LogisticRegressionSigmoid:
     
         error = target_class - probabilities
 
+        gradient = self.derivative(probabilities)
+
         # Update weights
         #self.weights = [w + self.learning_rate * error * x for w, x in zip(self.weights, input_vector)]
         for i in range(len(input_vector)):
-            self.weights[i] -= self.learning_rate * error * input_vector[i]  
+            self.weights[i] -= self.learning_rate * error * gradient * input_vector[i]  
         
         # Update bias
-        self.bias -= self.learning_rate * error
+        self.bias -= self.learning_rate * error * gradient
 
         loss += self.cross_entropy_loss(probabilities, target_class)
 
@@ -115,7 +132,7 @@ training_data = [
 
 
 # Train and Predict
-log_reg = LogisticRegressionSigmoid()
+log_reg = LogisticClassificationSigmoid()
 log_reg.reset(weights,bias)
 
 log_reg.log()
@@ -159,7 +176,7 @@ def plot_decision_boundary(log_reg, training_data, x_range=(-10, 10), y_range=(-
 
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
-    plt.title('Logistic Regression Decision Boundary')
+    plt.title('Logistic Classification Decision Boundary')
     plt.show()
 
 # Plot the decision boundary
