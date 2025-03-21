@@ -2,12 +2,27 @@ import random
 import numpy as np
 
 
+
 # Activation functions
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
 
-def sigmoid_prime(z):
+def sigmoid_derivative(z):
     return sigmoid(z) * (1 - sigmoid(z))
+
+
+def relu(x):
+        return np.maximum(0, x)
+
+def relu_derivative(z):
+    return np.where(z > 0, 1, 0)
+
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))  # Numerical stability
+    return exp_x / np.sum(exp_x, axis=0)
+
+def softmax_derivative(z, target_one_hot):
+    return z - target_one_hot
 
 
 class Network(object):
@@ -71,14 +86,14 @@ class Network(object):
             activations.append(activation)
 
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
+        delta = self.cost_derivative(activations[-1], y) * sigmoid_derivative(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].T)
 
         # Backpropagate through layers
         for l in range(2, self.num_layers):
             z = zs[-l]
-            sp = sigmoid_prime(z)
+            sp = sigmoid_derivative(z)
             delta = np.dot(self.weights[-l+1].T, delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].T)
