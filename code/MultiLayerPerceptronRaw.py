@@ -127,7 +127,7 @@ class MultiLayerPerceptron:
 
 # Generate training data with one-hot encoded labels
 # num samples is actually num samples per class 
-def generate_train_data(num_samples=300):
+def generate_train_data_raw(num_samples=300):
     random.seed(42)
 
     
@@ -141,6 +141,21 @@ def generate_train_data(num_samples=300):
     
     # One-hot encode labels for the classes (0, 1, 2)
     Y = [[1, 0, 0] for _ in range(num_samples)] + [[0, 1, 0] for _ in range(num_samples)] + [[0, 0, 1] for _ in range(num_samples)]
+
+    return X, Y
+
+# num samples is actually num samples per class 
+def generate_train_data_numpy(num_samples=300):
+    np.random.seed(42)
+
+
+    # Generate three classes of data
+    class1 = np.random.randn(2, num_samples) * 0.5 + np.array([[2], [2]])
+    class2 = np.random.randn(2, num_samples) * 0.5 + np.array([[-2], [-2]])
+    class3 = np.random.randn(2, num_samples) * 0.5 + np.array([[2], [-2]])
+
+    X = np.hstack((class1, class2, class3))
+    Y = np.array([0] * num_samples + [1] * num_samples + [2] * num_samples)
 
     return X, Y
 
@@ -169,7 +184,7 @@ def plot_decision_boundary(nn, X, Y, test_points = None, test_colors = None):
     plt.show()
 
 
-X_train, Y_train = generate_train_data()
+X_train, Y_train = generate_train_data_raw()
 
 mlp = MultiLayerPerceptron(input_size=2, hidden_layers=[3, 4], output_size=3, learning_rate=0.01, epochs=1000)
 mlp.train(X_train, Y_train)
