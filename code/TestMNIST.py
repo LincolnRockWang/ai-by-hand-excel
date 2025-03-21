@@ -38,36 +38,51 @@ class Network(object):
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a) + b)
         return a
-
-    def train(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None):
-        if test_data:
-            n_test = len(test_data)
-        n = len(training_data)
-        for j in range(epochs):
-            random.shuffle(training_data)
-            mini_batches = [
-                training_data[k:k+mini_batch_size]
-                for k in range(0, n, mini_batch_size)
-            ]
-            for mini_batch in mini_batches:
-                self.update_mini_batch(mini_batch, eta)
-            if test_data:
-                print("Epoch {}: {} / {}".format(
-                    j, self.predict(test_data), n_test))
-            else:
-                print("Epoch {} complete".format(j))
-
-    def update_mini_batch(self, mini_batch, eta):
+    
+    def train(self, training_data, eta, test_data):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
-        for x, y in mini_batch:
+
+        for i, (x, y) in enumerate(training_data):
+            print("Data {} / {}".format(i, len(training_data)))
+
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [w - (eta / len(mini_batch)) * nw
+
+        self.weights = [w - (eta / len(training_data)) * nw
                         for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b - (eta / len(mini_batch)) * nb
+        self.biases = [b - (eta / len(training_data)) * nb
+                       for b, nb in zip(self.biases, nabla_b)]
+
+
+    def train_by_batch(self, training_data, epochs, epoch_batch_size, eta, test_data):
+        n_test = len(test_data)
+        n_train = len(training_data)
+
+        for epoch in range(epochs):
+            random.shuffle(training_data)
+            epoch_batches = [
+                training_data[k:k+epoch_batch_size]
+                for k in range(0, n_train, epoch_batch_size)
+            ]
+            for epoch_batch in epoch_batches:
+                self.train_epoch_batch(epoch_batch, eta)
+
+            print("Epoch {}: {} / {}".format(epoch, self.predict(test_data), n_test))
+
+    def train_epoch_batch(self, epoch_batch, eta):
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
+
+        for x, y in epoch_batch:
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+            nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
+            nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+
+        self.weights = [w - (eta / len(epoch_batch)) * nw
+                        for w, nw in zip(self.weights, nabla_w)]
+        self.biases = [b - (eta / len(epoch_batch)) * nb
                        for b, nb in zip(self.biases, nabla_b)]
 
     def backprop(self, x, y):
@@ -97,6 +112,7 @@ class Network(object):
             delta = np.dot(self.weights[-l+1].T, delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].T)
+
         return (nabla_b, nabla_w)
 
     def predict(self, test_data):
@@ -111,5 +127,12 @@ class Network(object):
 
 import mnist_loader
 training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+# training_data consists of rows of (x,y)
+# x is a list of floats(0,1) which represents greycolor value in a 28x28 pixel map
+# y is a list of floats(0 or 1) which is actually a one hot vector that represents the target predict(number)
+
 net = Network([784, 100, 10])
-net.train(training_data, epochs=2, mini_batch_size=10, eta=3.0, test_data=test_data)
+#net.train_by_batch(training_data, epochs=2, epoch_batch_size=10, eta=3.0, test_data=test_data)
+net.train(training_data, eta=3.0, test_data=test_data)
+
+print("---------")
