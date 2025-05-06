@@ -132,7 +132,7 @@ training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
 # y is a list of floats(0 or 1) which is actually a one hot vector that represents the target predict(number)
 
 net = Network([784, 100, 10])
-#net.train_by_batch(training_data, epochs=2, epoch_batch_size=10, eta=3.0, test_data=test_data)
-net.train(training_data, eta=3.0, test_data=test_data)
+net.train_by_batch(training_data, epochs=20, epoch_batch_size=10, eta=3.0, test_data=test_data)
+#net.train(training_data, eta=3.0, test_data=test_data)
 
 print("---------")
